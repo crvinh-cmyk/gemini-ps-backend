@@ -10,8 +10,13 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { prompt, imageBase64 } = req.body;
+        let { prompt, imageBase64 } = req.body;
         const apikey = process.env.GEMINI_API_KEY;
+
+        // XỬ LÝ TRIỆT ĐỂ: Tách bỏ tiền tố "data:image/...;base64," nếu plugin có lỡ gửi kèm lên
+        if (imageBase64 && imageBase64.includes('base64,')) {
+            imageBase64 = imageBase64.split('base64,')[1];
+        }
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apikey}`, {
             method: 'POST',
